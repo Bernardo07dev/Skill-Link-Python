@@ -50,22 +50,20 @@ usuarios = {
 
 equipes = {
     "Equipe DevOps": {
-        "Integrantes": {
-            "gabriel": {
-                "idade": 20,
-                "habilidades": ["Python", "Machine Learning"],
-                "nivel": "basico"
-            },
-            "helena": {
-                "idade": 27,
-                "habilidades": ["PHP", "Laravel", "MySQL", "Vue.js"],
-                "nivel": "intermediario"
-            },
-            "igor": {
-                "idade": 33,
-                "habilidades": ["Go", "Microservices", "Redis", "MongoDB"],
-                "nivel": "avançado"
-            }
+        "gabriel": {
+            "idade": 20,
+            "habilidades": ["Python", "Machine Learning"],
+            "nivel": "basico"
+        },
+        "helena": {
+            "idade": 27,
+            "habilidades": ["PHP", "Laravel", "MySQL", "Vue.js"],
+            "nivel": "intermediario"
+        },
+        "igor": {
+            "idade": 33,
+            "habilidades": ["Go", "Microservices", "Redis", "MongoDB"],
+            "nivel": "avançado"
         }
     }
 }
@@ -93,7 +91,7 @@ def verifica_input(msg, lista):
     while mensagem.lower() not in lista:
         print(f"Apenas {', '.join(lista[:-1])} ou {lista[-1]} são permitidos")
         mensagem = input(msg + "\n -> ")
-    return mensagem
+    return mensagem.lower()
 
 def verifica_num(msg):
     mensagem = input(msg + "\n -> ")
@@ -102,13 +100,6 @@ def verifica_num(msg):
         mensagem = input(msg + "\n -> ")
     return int(mensagem)
 
-def printa_dic(dic):
-    for d in dic.keys():
-        print(f"---{d.upper()}---")
-        for info, values in dic[d].items():
-            print(f"{info} -> {values}")
-        print("")
-
 # FUNÇÃO CADASTRAR
 def cadastro(servidor):
     nome = verifica_vazio("Qual o seu nome")
@@ -116,13 +107,17 @@ def cadastro(servidor):
     servidor[nome]["idade"] = verifica_num("Qual sua idade")
     servidor[nome]["habilidades"] = verifica_vazio("Quais são suas habilidade").replace(",", "").split(" ")
     servidor[nome]["nivel"] = verifica_input("Qual seu nível (basico, intermediario, avançado)", ["basico", "intermediario", "avançado"])
+    listar_users(usuarios)
+    return
 
 # FUNÇÃO EDITAR
 def editar(servidor):
-    nome = verifica_input("Qual o nome do usuário que você quer editar", servidor.keys())
+    nome = verifica_input("Qual o nome do usuário que você quer editar", list(servidor.keys()))
     for u in servidor[nome].keys():
         if verifica_input(f"Quer editar o(a) {u} (s/n)", ["s", "n"]) == "s":
             servidor[nome][u] = verifica_vazio(f"Qual(is) o(a) novo(a) {u}")
+    listar_users(usuarios)
+    return
 
 # FUNÇÃO MONTAR EQUIPE
 def montar_equipe(servidor):
@@ -130,14 +125,11 @@ def montar_equipe(servidor):
     finalistas = {}
     nome = verifica_vazio("Qual o nome da equipe")
     qtd = verifica_num("Quantas pessoas você quer na equipe")
-    nivel = verifica_input("Qual seu nível você quer na equipe (basico, intermediario, avançado)", ["basico", "intermediario", "avançado"])
-    habilidades = verifica_vazio("Quais habilidades você precisa na equipe")
+    habilidade = verifica_vazio("Qual habilidade você precisa na equipe").replace(" ", "")
 
     for users in servidor.keys():
-        if (servidor[users]["nivel"]).lower() == nivel:
-            candidatos.append(users)
         for h in servidor[users]["habilidades"]:
-            if h.lower() == habilidades.lower():
+            if h.lower() == habilidade.lower():
                 candidatos.append(users)
                 break
 
@@ -151,7 +143,8 @@ def montar_equipe(servidor):
         finalistas[r] = servidor[r]
 
     equipes[nome] = finalistas
-    return equipes
+    mostrar_listas(equipes)
+    return
 
 # FUNÇÃO GERAR RECOMENDAÇÃO
 def recomendacao(servidor):
@@ -162,14 +155,29 @@ def recomendacao(servidor):
     elif servidor[nome]["nivel"] == "intermediario":
         resultado = random.sample(list(cursos), 2)
 
-    return resultado
+    print(f"---RECOMENDAÇÃO PARA {nome.upper()}--- \n {', '.join(resultado)}")
+    print("")
+    return
 
 # FUNÇÃO LISTAR USUÁRIOS
 def listar_users(servidor):
-    printa_dic(servidor)
+    for d in servidor.keys():
+        print(f"---{d.upper()}---")
+        for info, values in servidor[d].items():
+            print(f"{info}  {values}")
+        print("")
+    return
+
+#FUNÇÃO PARA MOSTRAR EQUIPES
+def mostrar_listas(servidor):
+    for l in servidor.keys():
+        print(f"----------{l}----------")
+        integrantes = servidor[l]
+        for k, v in integrantes.items():
+            print(f"   {k} \n   -> {v}")
 
 def menu(lista):
-    print(f" ==== SKILLLINK ==== \n 1. Cadastrar usuário \n 2. Editar usuário \n 3. Montar equipe \n 4. Recomendação de ReSkill \n 5. Listar usuários e habilidades \n 6. Sair \n")
+    print(f" ==== SKILLLINK ==== \n 1. Cadastrar usuário \n 2. Editar usuário \n 3. Montar equipe \n 4. Recomendação de ReSkill \n 5. Listar usuários e habilidades \n 6. Mostrar Equipes \n 7. Sair \n")
     escolha = verifica_input("Qual opção você quer", lista)
     return escolha
 
@@ -179,12 +187,16 @@ actions = {
     "3" : montar_equipe,
     "4" : recomendacao,
     "5": listar_users,
-    "6": "Sair"
+    "6": mostrar_listas,
+    "7": "Sair"
 }
 
-
 while True:
+    print("")
     option = menu(list(actions.keys()))
     if option == "6":
+        actions[option](equipes)
+        continue
+    elif option == "7":
         break
     actions[option](usuarios)
