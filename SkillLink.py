@@ -1,5 +1,7 @@
 import random
 
+# ==== SkillLink ====
+
 usuarios = {
     "bernardo": {
         "idade": 22,
@@ -94,11 +96,13 @@ def verifica_input(msg, lista):
     return mensagem.lower()
 
 def verifica_num(msg):
-    mensagem = input(msg + "\n -> ")
-    while not mensagem.isnumeric():
-        print("Apenas números são permitidos")
-        mensagem = input(msg + "\n -> ")
-    return int(mensagem)
+    while True:
+        try:
+            mensagem = input(msg + "\n -> ")
+            valor = int(mensagem)
+            return valor
+        except ValueError:
+            print("Erro: Digite apenas números inteiros válidos.")
 
 # FUNÇÃO CADASTRAR
 def cadastro(servidor):
