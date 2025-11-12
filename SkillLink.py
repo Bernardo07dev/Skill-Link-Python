@@ -1,11 +1,3 @@
-# ==== SKILLLINK ====
-# 1. Cadastrar usuário
-# 2. Editar usuário
-# 3. Montar equipe
-# 4. Recomendação de ReSkill
-# 5. Listar usuários e habilidades
-# 6. Sair
-
 import random
 
 usuarios = {
